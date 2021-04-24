@@ -57,7 +57,7 @@ function releaseAnts() {
 }
 
 function draw() {
-  background(220, 155);
+  background(220);
 
   homeBase.display();
   repellers.forEach((repeller) => repeller.display());
@@ -97,6 +97,7 @@ function draw() {
       const forceDir = p5.Vector.sub(mouse, mover.position);
       forceDir.setMag(3);
       mover.applyForce(forceDir);
+      mover.update();
     }
 
     mover.update();

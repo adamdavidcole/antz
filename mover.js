@@ -10,7 +10,10 @@ class Mover {
     this.velocity = createVector();
     this.acceleration = createVector();
     this.topspeed = TOP_SPEED;
-    this.mass = 3;
+    this.mass = this.getRandomSize();
+
+    this.legs = [];
+    this.generateLegs();
 
     this.hasFood = false;
     this.foundFoodSource = {};
@@ -19,6 +22,44 @@ class Mover {
 
     this.xOff = random(0, 1000);
     this.yOff = random(10000, 20000);
+  }
+
+  getRandomSize() {
+    function getR() {
+      while (true) {
+        const r1 = random();
+        let probability = 1 / (1000 * r1 + 1);
+        let r2 = random(1);
+        if (r2 < probability) {
+          return r1;
+        }
+      }
+    }
+
+    return map(getR(), 0, 1, 3, 8);
+  }
+
+  generateLegs() {
+    const origin1 = createVector(this.mass, 0);
+    // front left
+    const leg1 = new Leg(origin1, this.mass * 0.9, true);
+    const origin2 = createVector(0, 0);
+    // middle left
+    const leg2 = new Leg(origin2, this.mass * 0.95, true);
+    const origin3 = createVector(-this.mass, 0);
+    // back left
+    const leg3 = new Leg(origin3, this.mass, true);
+    const origin4 = createVector(this.mass, 0);
+    // front right
+    const leg4 = new Leg(origin1, this.mass * 0.9, false);
+    const origin5 = createVector(0, 0);
+    // middle right
+    const leg5 = new Leg(origin2, this.mass * 0.95, false);
+    // back right
+    const origin6 = createVector(-this.mass, 0);
+    const leg6 = new Leg(origin3, this.mass, false);
+
+    this.legs.push(leg1, leg2, leg3, leg4, leg5, leg6);
   }
 
   // Newton's 2nd law: F = M * A
@@ -56,7 +97,12 @@ class Mover {
     this.xOff += NOISE_INCR;
     this.yOff += NOISE_INCR;
 
-    this.applyForce(p5.Vector.add(mappedNoiseVec, randomJitterVec));
+    const bodyAccelertion = p5.Vector.add(mappedNoiseVec, randomJitterVec);
+    this.applyForce(bodyAccelertion);
+
+    this.legs.forEach((leg) => {
+      leg.update(bodyAccelertion);
+    });
   }
 
   maybeBeginExploring() {
@@ -102,14 +148,13 @@ class Mover {
   }
 
   display() {
-    stroke(0);
-    strokeWeight(1);
+    noStroke();
 
     // const fillColor = this.hasFood ? 250 : 50;
     const fillColor = 50;
 
     fill(fillColor);
-    const size = 2.5;
+    const size = this.mass;
     // ellipse(this.position.x, this.position.y, SIZE, SIZE);
     const { x, y } = this.position;
     const angle = this.velocity.heading();
@@ -117,9 +162,15 @@ class Mover {
     push();
     translate(x, y);
     rotate(angle);
-    ellipse(size, 0, size);
-    ellipse(0, 0, size);
-    ellipse(-size, 0, size);
+
+    const shiftMag = 0.93;
+
+    ellipse(size * sq(shiftMag), 0, size * shiftMag);
+    ellipse(0, 0, size * pow(shiftMag, 4));
+    ellipse(-size * sq(shiftMag), 0, size);
+    this.legs.forEach((leg) => {
+      leg.draw();
+    });
     pop();
   }
 
