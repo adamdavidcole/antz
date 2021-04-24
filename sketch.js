@@ -37,31 +37,53 @@ function setup() {
     foodSources.push(foodSource);
   }
 
-  movers.push(new Mover({ x: width / 2, y: width / 2 }));
+  // movers.push(new Mover({ x: width / 2, y: width / 2 }));
 
   repellers = [];
 
-  releaseAnts();
+  const initialPause = 100;
+  releaseAnts(initialPause);
 }
 
-function releaseAnts() {
-  const interval = setInterval(() => {
-    if (random() > movers.length / INITIAL_MOVERS_COUNT) {
-      movers.push(
-        new Mover({ x: homeBase.position.x, y: homeBase.position.y })
-      );
-    }
+function releaseAnts(initialPause) {
+  function releaseAnt(pause) {
+    console.log("pause", pause);
+    setTimeout(
+      () => {
+        console.log("start timeout");
+        if (movers.length === INITIAL_MOVERS_COUNT) {
+          console.log("break case?");
+          return;
+        }
 
-    if (movers.length === INITIAL_MOVERS_COUNT) clearInterval(interval);
-  }, 500);
+        movers.push(
+          new Mover({ x: homeBase.position.x, y: homeBase.position.y })
+        );
+
+        const nextPause = Math.max(pause * 0.96, 250);
+        console.log("next pause", nextPause);
+        releaseAnt(nextPause);
+      },
+      pause === initialPause ? 0 : pause
+    );
+  }
+
+  console.log("initialPause", initialPause);
+  releaseAnt(initialPause);
+
+  // const interval = setInterval(() => {
+  //   if (random() > movers.length / INITIAL_MOVERS_COUNT) {
+  //     movers.push(
+  //       new Mover({ x: homeBase.position.x, y: homeBase.position.y })
+  //     );
+  //   }
+
+  //   if (movers.length === INITIAL_MOVERS_COUNT) clearInterval(interval);
+  // }, 500);
 }
 
 function draw() {
   background(220);
-
-  homeBase.display();
-  repellers.forEach((repeller) => repeller.display());
-  foodSources.forEach((foodSource) => foodSource.display());
 
   movers.forEach((mover) => {
     if (mover.beginExploring) {
@@ -110,6 +132,10 @@ function draw() {
 
     mover.display();
   });
+
+  repellers.forEach((repeller) => repeller.display());
+  foodSources.forEach((foodSource) => foodSource.display());
+  homeBase.display();
 }
 
 // function mouseClicked() {

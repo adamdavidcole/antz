@@ -50,6 +50,7 @@ class Attractor {
 
   // Method to display
   display() {
+    fill(200);
     ellipseMode(CENTER);
     strokeWeight(4);
     stroke(0);
@@ -58,7 +59,7 @@ class Attractor {
     } else if (this.rollover) {
       fill(100);
     } else {
-      fill(175, 200);
+      fill(175);
     }
     ellipse(this.position.x, this.position.y, this.size * 2, this.size * 2);
   }
