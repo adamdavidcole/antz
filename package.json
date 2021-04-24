@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "p5.drawer": "^2.0.0"
+  }
+}

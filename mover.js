@@ -51,7 +51,7 @@ class Mover {
     const mappedNoiseVec = createVector(mappedXNoise, mappedYNoise).setMag(
       0.25
     );
-    const randomJitterVec = p5.Vector.random2D().setMag(2);
+    const randomJitterVec = p5.Vector.random2D().setMag(2); // 2
 
     this.xOff += NOISE_INCR;
     this.yOff += NOISE_INCR;
@@ -105,10 +105,22 @@ class Mover {
     stroke(0);
     strokeWeight(1);
 
-    const fillColor = this.hasFood ? 250 : 50;
+    // const fillColor = this.hasFood ? 250 : 50;
+    const fillColor = 50;
 
     fill(fillColor);
-    ellipse(this.position.x, this.position.y, SIZE, SIZE);
+    const size = 2.5;
+    // ellipse(this.position.x, this.position.y, SIZE, SIZE);
+    const { x, y } = this.position;
+    const angle = this.velocity.heading();
+
+    push();
+    translate(x, y);
+    rotate(angle);
+    ellipse(size, 0, size);
+    ellipse(0, 0, size);
+    ellipse(-size, 0, size);
+    pop();
   }
 
   checkEdges() {

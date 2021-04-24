@@ -27,8 +27,12 @@ class Attractor {
       const numExistingVisits = mover.getNumFoodSourceVisits(this) || 0;
       //   console.log("numExistingVisits", numExistingVisits);
       if (numExistingVisits > 0) {
+        const clampedNumExistingVisits = Math.min(
+          Math.max(numExistingVisits, 1),
+          4
+        );
         // console.log("strength before", strength);
-        strength = strength + numExistingVisits;
+        strength = strength + clampedNumExistingVisits;
         // console.log("strength after", strength);
       }
     }

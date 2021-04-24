@@ -5,16 +5,18 @@ let movers;
 let homeBase;
 let foodSources;
 let repellers;
+let rec;
 
 function setup() {
-  createCanvas(1000, 600);
+  createCanvas(600, 600);
+  rec = new p5.Recorder();
 
   homeBase = new Attractor({
     type: "home",
-    x: width / 2,
-    y: height - 100,
-    mass: 100,
-    size: 25,
+    x: 0,
+    y: 0,
+    mass: 250,
+    size: 50,
   });
 
   movers = [];
@@ -23,20 +25,26 @@ function setup() {
   for (let i = 0; i < INITIAL_FOOD_SOURCE_COUNT; i++) {
     const yOffset = random(0, height / 3);
     const xOffset = (width / INITIAL_FOOD_SOURCE_COUNT) * i + random(width / 3);
-
+    map;
     foodSource = new Attractor({
       type: "food",
-      x: xOffset,
-      y: yOffset,
-      mass: 10,
+      x: width,
+      y: height,
+      mass: 25,
       size: 25,
     });
 
     foodSources.push(foodSource);
   }
 
+  movers.push(new Mover({ x: width / 2, y: width / 2 }));
+
   repellers = [];
 
+  releaseAnts();
+}
+
+function releaseAnts() {
   const interval = setInterval(() => {
     if (random() > movers.length / INITIAL_MOVERS_COUNT) {
       movers.push(
@@ -49,7 +57,7 @@ function setup() {
 }
 
 function draw() {
-  background(220, 150);
+  background(220, 155);
 
   homeBase.display();
   repellers.forEach((repeller) => repeller.display());
@@ -84,6 +92,13 @@ function draw() {
       mover.maybeBeginExploring();
     }
 
+    if (mouseIsPressed) {
+      const mouse = createVector(mouseX, mouseY);
+      const forceDir = p5.Vector.sub(mouse, mover.position);
+      forceDir.setMag(3);
+      mover.applyForce(forceDir);
+    }
+
     mover.update();
 
     foodSources.forEach((foodSource) => {
@@ -96,18 +111,18 @@ function draw() {
   });
 }
 
-function mouseClicked() {
-  repellers.push(
-    new Attractor({
-      type: "repeller",
-      x: mouseX,
-      y: mouseY,
-      mass: 50,
-      size: 10,
-      shouldAttract: false,
-    })
-  );
-}
+// function mouseClicked() {
+//   repellers.push(
+//     new Attractor({
+//       type: "repeller",
+//       x: mouseX,
+//       y: mouseY,
+//       mass: 50,
+//       size: 10,
+//       shouldAttract: false,
+//     })
+//   );
+// }
 
 function getWorldState() {
   return {
